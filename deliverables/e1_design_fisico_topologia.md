@@ -1,44 +1,31 @@
-# E1 - Design Físico e Topologia
+# E1 \- Design Físico e Topologia
 
-**Projeto:** Reestruturação da Rede dos Laboratórios do CIn-UFPE  
-**Entrega:** E1 - Design Físico e Topologia  
-**Data de entrega:** 01/05/2026  
-**Critério principal:** Racionalidade
+**Grupo 1**
 
-## 1. Objetivo da Entrega
+## 1\. Equipamentos Utilizados
 
-Esta entrega documenta o desenho físico inicial da rede, a alocação dos equipamentos disponíveis, a justificativa para a quantidade de switches de acesso e a identificação das portas configuradas como **Trunk** e **Access**.
+| Equipamento | Modelo | Quantidade | Função na Topologia | Conexões |
+| :---- | :---- | ----: | :---- | :---- |
+| Roteador de Borda | Cisco 2911 | 1 | Conexão com a RNP, roteamento Inter-VLAN via Router-on-a-Stick e serviço DHCP | Gi0/0 \-\> SW-CORE Gi0/1; Gi0/1 \-\> RNP 2.2.2.2/30 |
+| Switch Core | Cisco 3560-24PS | 1 | Core colapsado; agrega todos os switches de acesso e concentra os trunks das VLANs | Gi0/1 \-\> R-CIN Gi0/0; Fa0/1-Fa0/7 \-\> switches de acesso |
+| Switches de Acesso | Cisco 2960-24TT | 7 | Conexão dos hosts, isolamento por VLAN e encaminhamento ao core via trunk | Gi0/1 \-\> SW-CORE; Fa0/x \-\> PCs |
+| PCs | PC | 120 | Dispositivos finais dos laboratórios simulados | Placas FastEthernet \-\> portas Access dos switches |
 
-O desenho foi planejado para suportar cinco laboratórios simulados, cada um associado a uma VLAN própria nas próximas entregas. A topologia usa um modelo hierárquico com **Core Colapsado**, no qual o switch core concentra as funções de distribuição e agregação.
-
-## 2. Equipamentos Utilizados
-
-| Equipamento | Modelo | Qtd | Função na Topologia | Conexões |
-| --- | --- | ---: | --- | --- |
-| Roteador de Borda | Cisco 2911 | 1 | Conexão com a RNP, roteamento Inter-VLAN via Router-on-a-Stick e serviço DHCP | Gi0/0 -> SW-CORE Gi0/1; Gi0/1 -> RNP 2.2.2.2/30 |
-| Switch Core | Cisco 3560-24PS | 1 | Core colapsado; agrega todos os switches de acesso e concentra os trunks das VLANs | Gi0/1 -> R-CIN Gi0/0; Fa0/1-Fa0/7 -> switches de acesso |
-| Switches de Acesso | Cisco 2960-24TT | 7 | Conexão dos hosts, isolamento por VLAN e encaminhamento ao core via trunk | Gi0/1 -> SW-CORE; Fa0/x -> PCs |
-| PCs | PC | 120 | Dispositivos finais dos laboratórios simulados | Placas FastEthernet -> portas Access dos switches |
-
-## 3. Justificativa da Quantidade de Switches de Acesso
-
-Cada switch Cisco 2960-24TT possui 24 portas FastEthernet para hosts e portas GigabitEthernet para uplink. Como o projeto deve acomodar laboratórios de 35, 30, 20, 20 e 15 hosts, a distribuição mínima racional é:
+## 2\.  Distribuição de Switches de Acesso
 
 | Laboratório | Hosts | Switches Necessários | Justificativa |
-| --- | ---: | ---: | --- |
-| Lab 35 | 35 | 2 | Um único switch de 24 portas não comporta 35 hosts. Divisão em 18 + 17 hosts. |
-| Lab 30 | 30 | 2 | Um único switch de 24 portas não comporta 30 hosts. Divisão em 15 + 15 hosts. |
+| :---- | ----: | ----: | :---- |
+| Lab 35 | 35 | 2 | Um único switch de 24 portas não comporta 35 hosts. Divisão em 18 \+ 17 hosts. |
+| Lab 30 | 30 | 2 | Um único switch de 24 portas não comporta 30 hosts. Divisão em 15 \+ 15 hosts. |
 | Lab 20-A | 20 | 1 | Um switch comporta todos os hosts e mantém portas livres para manutenção. |
 | Lab 20-B | 20 | 1 | Um switch comporta todos os hosts e mantém portas livres para manutenção. |
 | Lab 15 | 15 | 1 | Um switch comporta todos os hosts com folga. |
 | **Total** | **120** | **7** | Usa todos os switches disponíveis sem desperdiçamento estrutural. |
 
-Essa distribuição respeita a capacidade física dos switches, evita concentrar laboratórios grandes em equipamentos insuficientes e preserva organização lógica para as VLANs.
-
-## 4. Nomenclatura Proposta
+## 3\. Nomenclatura Proposta
 
 | Nome | Dispositivo | Laboratório / Função |
-| --- | --- | --- |
+| :---- | :---- | :---- |
 | R-CIN | Cisco 2911 | Roteador de borda do CIn |
 | SW-CORE | Cisco 3560-24PS | Switch core colapsado |
 | SW-LAB35-A | Cisco 2960-24TT | Primeira parte do laboratório de 35 hosts |
@@ -49,12 +36,12 @@ Essa distribuição respeita a capacidade física dos switches, evita concentrar
 | SW-LAB20-B | Cisco 2960-24TT | Laboratório de 20 hosts |
 | SW-LAB15 | Cisco 2960-24TT | Laboratório de 15 hosts |
 
-## 5. Plano de Portas Trunk
+## 4\. Plano de Portas Trunk
 
 As portas trunk devem transportar as VLANs dos laboratórios entre os switches de acesso, o switch core e o roteador. Para esta entrega, considera-se uma VLAN por laboratório.
 
 | Origem | Porta | Destino | Porta | Tipo | Observação |
-| --- | --- | --- | --- | --- | --- |
+| :---- | :---- | :---- | :---- | :---- | :---- |
 | R-CIN | Gi0/0 | SW-CORE | Gi0/1 | Trunk 802.1Q | Link para Router-on-a-Stick; transporta todas as VLANs internas |
 | R-CIN | Gi0/1 | RNP | Interface do provedor | WAN | Link externo /30 para 2.2.2.2 |
 | SW-CORE | Fa0/1 | SW-LAB35-A | Gi0/1 | Trunk | Transporta a VLAN do Lab 35 |
@@ -65,12 +52,12 @@ As portas trunk devem transportar as VLANs dos laboratórios entre os switches d
 | SW-CORE | Fa0/6 | SW-LAB20-B | Gi0/1 | Trunk | Transporta a VLAN do Lab 20-B |
 | SW-CORE | Fa0/7 | SW-LAB15 | Gi0/1 | Trunk | Transporta a VLAN do Lab 15 |
 
-## 6. Plano de Portas Access
+## 5\. Plano de Portas Access
 
 As portas de acesso conectam os PCs de cada laboratório. Cada grupo de portas deve ser associado a uma VLAN específica na E3.
 
 | Switch de Acesso | Laboratório | Portas Access para PCs | Quantidade de PCs | Observação |
-| --- | --- | --- | ---: | --- |
+| :---- | :---- | :---- | ----: | :---- |
 | SW-LAB35-A | Lab 35 | Fa0/1-Fa0/18 | 18 | Mesma VLAN do Lab 35 |
 | SW-LAB35-B | Lab 35 | Fa0/1-Fa0/17 | 17 | Mesma VLAN do Lab 35 |
 | SW-LAB30-A | Lab 30 | Fa0/1-Fa0/15 | 15 | Mesma VLAN do Lab 30 |
@@ -79,13 +66,12 @@ As portas de acesso conectam os PCs de cada laboratório. Cada grupo de portas d
 | SW-LAB20-B | Lab 20-B | Fa0/1-Fa0/20 | 20 | VLAN própria do laboratório |
 | SW-LAB15 | Lab 15 | Fa0/1-Fa0/15 | 15 | VLAN própria do laboratório |
 
-As portas FastEthernet restantes devem permanecer desligadas administrativamente até uso futuro.
+## 6\. O Design
 
-## 7. Racionalidade do Design
+![Diagrama de Topologia Física](./e1_topologia.png)
 
-O desenho usa uma topologia em estrela hierárquica, com todos os switches de acesso conectados ao SW-CORE. Essa escolha simplifica o gerenciamento, facilita troubleshooting e permite que o tráfego entre VLANs seja encaminhado de forma centralizada pelo R-CIN.
+O desenho usa uma topologia em estrela hierárquica, com todos os switches de acesso conectados ao SW-CORE.
 
 O switch core atua como ponto de agregação e não conecta PCs diretamente. Os switches 2960 ficam responsáveis pela camada de acesso, enquanto o 3560 concentra os uplinks e distribui os trunks.
 
 Os laboratórios maiores foram divididos em dois switches porque excedem a capacidade prática de um único 2960-24TT para hosts.
-
